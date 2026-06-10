@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2027 Journey to Singapore</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Nunito', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', '"Microsoft YaHei"', 'sans-serif'],
+                        serif: ['Playfair Display', 'Georgia', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            500: '#f97316', /* 核心温暖橘 */
+                            600: '#ea580c',
+                            900: '#7c2d12',
+                        },
+                        apple: {
+                            gray: '#f5f5f7',
+                            dark: '#1d1d1f',
+                            blue: '#0066cc'
+                        }
+                    },
+                    borderRadius: {
+                        '3xl': '24px',
+                        '4xl': '32px',
+                    },
+                    boxShadow: {
+                        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.04)',
+                        'apple': '0 4px 30px rgba(0, 0, 0, 0.02)',
+                        'hover': '0 20px 40px rgba(234, 88, 12, 0.08)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Nunito', -apple-system, sans-serif;
+            background-color: #fafafa;
+            color: #1d1d1f;
+            -webkit-font-smoothing: antialiased;
+        }
+        .backdrop-glass {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+        /* 隐藏滚动条但保留功能 */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        /* 极其丝滑的全局过渡 */
+        * {
+            transition: property 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) duration 0.3s;
+        }
+        /* Apple 风格流式渐入动画 */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeInUp 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+        /* 增量追加：Material Design 3 与现代排版覆写 */
+        :root {
+            --md-sys-color-primary: #f97316;
+            --md-sys-color-surface-variant: #f5f5f7;
+        }
+
+        body {
+            line-height: 1.85 !important; /* 正文行高完美锁定 1.85 */
+        }
+
+        /* 强制覆盖卡片间距与大圆角 */
+        .mat-card, [class*="mat-card"], .timeline-item .bg-white {
+            border-radius: 28px !important; /* 标准 MD3 大圆角 28px */
+            padding: 24px !important;       /* 卡片内部间距 24px */
+            margin-bottom: 32px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 4px 16px rgba(249,115,22,0.03) !important;
+            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+        }
+
+        /* 标题与正文间距调配 */
+        h1, h2, h3, h4 {
+            margin-bottom: 16px !important;
+            font-weight: 700 !important;
+            letter-spacing: -0.02em;
+        }
+
+        /* 模块之间增加留白 */
+        section {
+            padding-top: 80px !important;
+            padding-bottom: 80px !important;
+        }
+
+        /* Ripple 交互微动效与 Timeline 当前阅读高亮 */
+        .timeline-item {
+            transition: all 0.4s ease;
+        }
+        .timeline-item:hover {
+            transform: scale(1.01);
+        }
+        .timeline-item:hover .absolute.rounded-full {
+            background-color: var(--md-sys-color-primary) !important;
+            box-shadow: 0 0 0 8px rgba(249, 115, 22, 0.2);
+        }
+
+        /* MD3 按钮微动 */
+        .chip, [onclick], button {
+            position: relative;
+            overflow: hidden;
+            border-radius: 16px !important;
+        }
+        .chip:active::after, [onclick]:active::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: rgba(249, 115, 22, 0.15);
+            animation: ripple 0.4s linear;
+        }
+        @keyframes ripple {
+            from { opacity: 1; transform: scale(0.8); }
+            to { opacity: 0; transform: scale(1.5); }
+        }
+    </style>
+</head>
+<body class="pb-24 md:pb-0">
+
+    <nav class="sticky top-0 z-40 w-full border-b border-black/[0.03] backdrop-glass">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 rounded-full bg-brand-500 flex items-center justify-center text-white font-bold text-sm tracking-tighter">🇸🇬</div>
+                <span class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-brand-600 to-amber-500 bg-clip-text text-transparent">2027 Journey to Singapore 🇸🇬</span>
+            </div>
+            <div class="hidden md:flex space-x-8 text-sm font-semibold text-gray-500">
+                <a href="#section-strat" class="hover:text-brand-500 transition-colors">住宿与边界</a>
+                <a href="#section-map" class="hover:text-brand-500 transition-colors">全局动线</a>
+                <a href="#section-timeline" class="hover:text-brand-500 transition-colors">互动日程</a>
+                <a href="#section-academic" class="hover:text-brand-500 transition-colors">名校对决</a>
+                <a href="#section-tools" class="hover:text-brand-500 transition-colors">行前枢纽</a>
+                <a href="#section-budget" class="hover:text-brand-500 transition-colors">精算精算</a>
+            </div>
+            <div class="text-xs bg-brand-100 text-brand-600 px-3 py-1.5 rounded-full font-bold">
+                🎓 18岁成年礼专案
+            </div>
+        </div>
+    </nav>
+
+    <header class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16">
+        <div class="relative rounded-4xl overflow-hidden shadow-glass bg-apple-dark aspect-[16/9] max-h-[560px] flex items-center">
+            <img src="https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=1600&q=80" alt="Singapore Marina Bay" class="absolute inset-0 w-full h-full object-cover opacity-60 transform scale-105 hover:scale-100 transition-transform duration-1000">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+            <div class="relative z-10 max-w-3xl ml-6 md:ml-12 text-white pr-6">
+                <span class="inline-block bg-brand-500 text-white text-xs font-extrabold uppercase tracking-widest px-3 py-1 rounded-md mb-4"></span>
+                <h1 class="text-3xl md:text-6xl font-black tracking-tight leading-none mb-4">
+                    2027 Journey to Singapore<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-100 to-amber-300">把未来交给时间</span>
+                </h1>
+                <p class="text-sm md:text-lg text-gray-200 font-medium max-w-xl mb-6">
+                    从环球影城的放肆尖叫，到 165 米高空的宁静凝望。
+                </p>
+                <div class="flex flex-wrap gap-3">
+                    <a href="#section-timeline" class="bg-white text-apple-dark text-xs md:text-sm font-bold px-6 py-3 rounded-full shadow-apple hover:bg-gray-100 transition-all">开启互动日程</a>
+                    <a href="#section-tools" class="bg-white/20 backdrop-blur-md text-white border border-white/30 text-xs md:text-sm font-bold px-6 py-3 rounded-full hover:bg-white/30 transition-all">行前工具箱</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section id="section-strat" class="max-w-7xl mx-auto px-6 py-12">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-8">
+            <div>
+                <span class="text-xs font-extrabold tracking-wider text-brand-500 uppercase">Socializing and Accommodation</span>
+                <h2 class="text-2xl md:text-4xl font-extrabold tracking-tight mt-1 text-apple-dark">社交与住宿</h2>
+            </div>
+            <p class="text-xs md:text-sm text-gray-500 max-w-md mt-2 md:mt-0">
+                在确保绝对安全边界的前提下，达成极致的体验性价比。
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 bg-white rounded-3xl p-6 shadow-apple border border-black/[0.02] flex flex-col justify-between hover:shadow-hover transition-all">
+                <div>
+                    <div class="relative overflow-hidden rounded-2xl aspect-[21/9] mb-6">
+                        <img src="https://cf.bstatic.com/xdata/images/hotel/max1024x768/115494746.jpg?k=bae7659798cb231805e7e04c6de6776f1a5ced0050fb996798a871cb829949b4&o=" alt="Village Hotel Bugis" class="w-full h-full object-cover">
+                        <span class="absolute top-4 left-4 bg-white/90 backdrop-blur-md text-apple-dark text-xs font-bold px-3 py-1 rounded-full shadow-sm">第 1 - 4 晚 · 市区阵地</span>
+                    </div>
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="text-xl font-bold text-apple-dark">Village Hotel Bugis</h3>
+                            <p class="text-xs text-gray-400 mt-0.5"><i class="fa-solid fa-location-dot text-brand-500 mr-1"></i>390 Victoria St, Singapore 188061</p>
+                        </div>
+                        <div class="flex space-x-2">
+                            <a href="https://www.google.com/maps/search/?api=1&query=Village+Hotel+Bugis+Singapore" target="_blank" class="w-8 h-8 rounded-full bg-apple-gray flex items-center justify-center text-apple-blue text-sm hover:bg-apple-blue hover:text-white" title="地图导航"><i class="fa-solid fa-map-location-dot"></i></a>
+                            <a href="https://www.agoda.com/zh-cn/village-hotel-bugis-by-far-east-hospitality/hotel/singapore-sg.html" target="_blank" class="w-8 h-8 rounded-full bg-apple-gray flex items-center justify-center text-orange-500 text-sm hover:bg-orange-500 hover:text-white" title="Agoda 订房"><i class="fa-solid fa-hotel"></i></a>
+                        </div>
+                    </div>
+                    <p class="text-xs md:text-sm text-gray-600 leading-relaxed">
+                        选取市区精品四星级标准间，客房空间极度宽敞（近32㎡）。采取“两房共享”模式：两名男生、两名女生分别合住一间双床房。相比单间房差直接斩断了将近 <span class="text-brand-600 font-bold">¥4,300</span> 的硬性成本支出。距离 Bugis 地铁站仅 400 米，无缝接入甘榜格南与哈芝巷。
+                    </p>
+                </div>
+                <div class="mt-6 pt-4 border-t border-black/[0.03] flex items-center justify-between text-xs font-bold text-gray-400">
+                    <span>通勤便利性: 极高 (多线枢纽)</span>
+                    <span class="text-green-600 bg-green-50 px-2 py-1 rounded-md">已省 ¥4,300/人</span>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-3xl p-6 shadow-apple border border-black/[0.02] flex flex-col justify-between hover:shadow-hover transition-all">
+                <div>
+                    <div class="relative overflow-hidden rounded-2xl aspect-[4/3] mb-6">
+                        <img src="https://zh.marinabaysands.com/content/dam/marinabaysands/guides/exceptional-experiences/architecture-of-mbs/masthead.jpg" alt="MBS Singapore" class="w-full h-full object-cover">
+                        <span class="absolute top-4 left-4 bg-brand-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">第 5 晚 · 终极奢华</span>
+                    </div>
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-xl font-bold text-apple-dark">滨海湾金沙酒店</h3>
+                        <a href="https://www.marinabaysands.com" target="_blank" class="text-xs text-apple-blue font-bold flex items-center hover:underline">官网订购 <i class="fa-solid fa-arrow-up-right-from-square ml-1"></i></a>
+                    </div>
+                    <p class="text-xs text-gray-600 leading-relaxed mb-4">
+                        57层空中无边泳池实行极严苛的一人一卡一闸机房卡准入制度。为确保全员深度覆盖体验，必须预订两间客房并进行合规的双人客房实名登记。
+                    </p>
+                    <button onclick="openModal('modal-mbs')" class="w-full py-3 bg-brand-50 text-brand-600 hover:bg-brand-500 hover:text-white rounded-2xl text-xs font-bold flex items-center justify-center space-x-2 transition-all">
+                        <i class="fa-solid fa-network-wired"></i>
+                        <span>查看金沙连通房 (Connecting Rooms) 申请流程</span>
+                    </button>
+                </div>
+                <div class="mt-4 pt-4 border-t border-black/[0.03] text-xs font-semibold text-gray-400 flex justify-between">
+                    <span>无边泳池权限: 100% 覆盖</span>
+                    <span class="text-brand-500">双房连通机制</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="section-map" class="max-w-7xl mx-auto px-6 py-6">
+        <div class="bg-white rounded-4xl p-6 shadow-apple border border-black/[0.02]">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-black text-apple-dark flex items-center"><i class="fa-solid fa-map-location text-brand-500 mr-2"></i>Singapore 地图全览</h2>
+                </div>
+                <a href="https://maps.google.com" target="_blank" class="mt-2 md:mt-0 bg-apple-gray text-apple-dark font-bold text-xs px-4 py-2.5 rounded-full hover:bg-gray-200 flex items-center space-x-1.5">
+                    <i class="fa-brands fa-google-play"></i>
+                    <span>在 Google Maps App 中打开</span>
+                </a>
+            </div>
+            <div class="w-full aspect-[21/9] min-h-[320px] max-h-[420px] rounded-2xl overflow-hidden shadow-inner bg-gray-100">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15955.165681284583!2d103.85408665!3d1.29158315!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31da19bc2a188567%3A0xe54fb7256eddfc85!2sMarina%20Bay%20Sands%20Singapore!5e0!3m2!1szh-CN!2sus!4v1700000000000!5m2!1szh-CN!2sus" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+        </div>
+    </section>
+
+    <section id="section-timeline" class="max-w-7xl mx-auto px-6 py-12">
+        <div class="text-center max-w-2xl mx-auto mb-16">
+            <span class="text-xs font-extrabold tracking-widest text-brand-500 bg-brand-50 px-3 py-1 rounded-full uppercase">Interactive Timeline</span>
+            <h2 class="text-3xl md:text-4xl font-black text-apple-dark mt-3 tracking-tight">动态时间轴与高能卡片</h2>
+            <p class="text-xs md:text-sm text-gray-500 mt-2">点击任意行程节点卡片即可瞬间唤醒深层交互，包含排队极速攻略、购票入口与多温区防御提示。</p>
+        </div>
+
+        <div class="relative border-l-2 border-dashed border-gray-200 ml-4 md:ml-32 space-y-12 pb-8">
+            
+            <div class="relative group pl-6 md:pl-12">
+                <div class="absolute -left-6 md:-left-36 top-0 w-12 md:w-28 text-center">
+                    <span class="block text-2xl font-black text-brand-500 leading-none">01</span>
+                    <span class="text-[10px] md:text-xs font-bold text-gray-400 tracking-widest uppercase block mt-1">DAY 1 · 重逢</span>
+                </div>
+                <div class="absolute -left-[7px] top-2.5 w-3 h-3 rounded-full bg-brand-500 group-hover:scale-150 transition-transform"></div>
+                
+                <div class="bg-white rounded-3xl p-6 shadow-apple border border-black/[0.01] hover:shadow-hover cursor-pointer" onclick="openDetails('day1')">
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <div class="w-full md:w-1/3 aspect-[4/3] rounded-2xl overflow-hidden bg-gray-100">
+                            <img src="https://www.visitsingapore.com.cn/content/dam/visitsingapore/neighbourhoods/marina-bay/page-image-merlion-park_756x560.jpg" alt="Merlion" class="w-full h-full object-cover">
+                        </div>
+                        <div class="w-full md:w-2/3 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-gray-400"><i class="fa-regular fa-clock mr-1"></i>黄昏 — 夜间</span>
+                                    <span class="text-xs bg-amber-50 text-amber-700 font-bold px-2 py-0.5 rounded">极致出片光线</span>
+                                </div>
+                                <h3 class="text-xl font-extrabold text-apple-dark mt-1 group-hover:text-brand-500 transition-colors">鱼尾狮、金沙水上 Apple Store 与 Spectra 水舞秀</h3>
+                                <p class="text-xs text-gray-500 mt-2 line-clamp-2">四人在新加坡的核心地标群完成第一张最具仪式感的重逢大合影。随后转场至建筑学奇迹——全球唯一的苹果水上漂浮旗舰店，最终在金沙户外广场锁定夜间八点的交响水舞秀。</p>
+                            </div>
+                            <div class="flex items-center justify-between mt-4 pt-4 border-t border-black/[0.02]">
+                                <span class="text-xs font-bold text-brand-500"><i class="fa-solid fa-circle-plus mr-1"></i>点击查看详细信息</span>
+                                <div class="flex space-x-1">
+                                    <span class="w-6 h-6 rounded-full bg-apple-gray text-apple-dark text-[10px] flex items-center justify-center" title="含导航"><i class="fa-solid fa-location-arrow"></i></span>
+                                    <span class="w-6 h-6 rounded-full bg-apple-gray text-apple-dark text-[10px] flex items-center justify-center" title="免费开放"><i class="fa-solid fa-gift"></i></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative group pl-6 md:pl-12">
+                <div class="absolute -left-6 md:-left-36 top-0 w-12 md:w-28 text-center">
+                    <span class="block text-2xl font-black text-brand-500 leading-none">02</span>
+                    <span class="text-[10px] md:text-xs font-bold text-gray-400 tracking-widest uppercase block mt-1">DAY 2 · 释放</span>
+                </div>
+                <div class="absolute -left-[7px] top-2.5 w-3 h-3 rounded-full bg-brand-500 group-hover:scale-150 transition-transform"></div>
+                
+                <div class="bg-white rounded-3xl p-6 shadow-apple border border-black/[0.01] hover:shadow-hover cursor-pointer" onclick="openDetails('day2')">
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <div class="w-full md:w-1/3 aspect-[4/3] rounded-2xl overflow-hidden bg-gray-100">
+                            <img src="https://www.rwsentosa.com/-/jssmedia/project/non-gaming/rwsentosa/attractions/universal-studios-singapore/masthead-banner/universal-studios-singapore-masthead_sc_2160x1140.jpg?mw=8751" alt="USS" class="w-full h-full object-cover">
+                        </div>
+                        <div class="w-full md:w-2/3 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-gray-400"><i class="fa-regular fa-clock mr-1"></i>09:30 — 18:00 全天开城</span>
+                                    <span class="text-xs bg-red-50 text-red-600 font-bold px-2 py-0.5 rounded">高体能闭环</span>
+                                </div>
+                                <h3 class="text-xl font-extrabold text-apple-dark mt-1 group-hover:text-brand-500 transition-colors">新加坡环球影城 (USS) 压力释放通关</h3>
+                                <p class="text-xs text-gray-500 mt-2 line-clamp-2">刚性列装单次快捷通行证，逆时针极速闪击绕行战术。下午极热时段强力嵌入强冷气室内过山车项目，无缝对冲室外 35°C 极端热浪。</p>
+                            </div>
+                            <div class="flex items-center justify-between mt-4 pt-4 border-t border-black/[0.02]">
+                                <span class="text-xs font-bold text-brand-500"><i class="fa-solid fa-circle-plus mr-1"></i>点击查看详细信息</span>
+                                <div class="flex space-x-1">
+                                    <span class="w-6 h-6 rounded-full bg-apple-gray text-apple-dark text-[10px] flex items-center justify-center"><i class="fa-solid fa-ticket"></i></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative group pl-6 md:pl-12">
+                <div class="absolute -left-6 md:-left-36 top-0 w-12 md:w-28 text-center">
+                    <span class="block text-2xl font-black text-brand-500 leading-none">03</span>
+                    <span class="text-[10px] md:text-xs font-bold text-gray-400 tracking-widest uppercase block mt-1">DAY 3 · 海岛</span>
+                </div>
+                <div class="absolute -left-[7px] top-2.5 w-3 h-3 rounded-full bg-brand-500 group-hover:scale-150 transition-transform"></div>
+                
+                <div class="bg-white rounded-3xl p-6 shadow-apple border border-black/[0.01] hover:shadow-hover cursor-pointer" onclick="openDetails('day3')">
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <div class="w-full md:w-1/3 aspect-[4/3] rounded-2xl overflow-hidden bg-gray-100">
+                            <img src="https://www.visitsingapore.com.cn/content/dam/visitsingapore/neighbourhoods/sentosa/video-fallback_780x440.jpg" alt="Sentosa Beach Club" class="w-full h-full object-cover">
+                        </div>
+                        <div class="w-full md:w-2/3 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-gray-400"><i class="fa-regular fa-clock mr-1"></i>11:00 — 20:30</span>
+                                    <span class="text-xs bg-blue-50 text-blue-600 font-bold px-2 py-0.5 rounded">轻奢社交与全维竞速</span>
+                                </div>
+                                <h3 class="text-xl font-extrabold text-apple-dark mt-1 group-hover:text-brand-500 transition-colors">圣淘沙 +Twelve、三层电动卡丁车与时光之翼水幕烟花</h3>
+                                <p class="text-xs text-gray-500 mt-2 line-clamp-2">租用 +Twelve 海滩俱乐部专属日光榻，体验极具沉浸感的南洋岛屿风情。随后驾临亚洲首家三层全 LED 赛道 HyperDrive，引爆成年礼竞技。夜间高能锁定沙滩巨幕烟花演艺。</p>
+                            </div>
+                            <div class="flex items-center justify-between mt-4 pt-4 border-t border-black/[0.02]">
+                                <span class="text-xs font-bold text-brand-500"><i class="fa-solid fa-circle-plus mr-1"></i>点击查看详细信息</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative group pl-6 md:pl-12">
+                <div class="absolute -left-6 md:-left-36 top-0 w-12 md:w-28 text-center">
+                    <span class="block text-2xl font-black text-brand-500 leading-none">04</span>
+                    <span class="text-[10px] md:text-xs font-bold text-gray-400 tracking-widest uppercase block mt-1">DAY 4 · 人文</span>
+                </div>
+                <div class="absolute -left-[7px] top-2.5 w-3 h-3 rounded-full bg-brand-500 group-hover:scale-150 transition-transform"></div>
+                
+                <div class="bg-white rounded-3xl p-6 shadow-apple border border-black/[0.01] hover:shadow-hover cursor-pointer" onclick="openDetails('day4')">
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <div class="w-full md:w-1/3 aspect-[4/3] rounded-2xl overflow-hidden bg-gray-100">
+                            <img src="https://img.huanqiucdn.cn/dp/api/files/imageDir/26dceadf7b927d69827edd3db437aee7u5.jpg?imageView2/2/w/750" alt="National Museum" class="w-full h-full object-cover">
+                        </div>
+                        <div class="w-full md:w-2/3 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-gray-400"><i class="fa-regular fa-clock mr-1"></i>08:30 — 18:30</span>
+                                    <span class="text-xs bg-purple-50 text-purple-600 font-bold px-2 py-0.5 rounded">无缝全室内避暑冷气转场</span>
+                                </div>
+                                <h3 class="text-xl font-extrabold text-apple-dark mt-1 group-hover:text-brand-500 transition-colors">福康宁神秘巨型树洞、国家博物馆历史洗礼</h3>
+                                <p class="text-xs text-gray-500 mt-2 line-clamp-2">福康宁绿色螺旋阶梯清晨包场写真。随后直接通过5分钟纯地下通道无缝切入国家博物馆高冷气展厅。暮色降临后步入莱佛士酒店 Long Bar，共饮成年后第一杯带有历史烙印的新加坡司令。</p>
+                            </div>
+                            <div class="flex items-center justify-between mt-4 pt-4 border-t border-black/[0.02]">
+                                <span class="text-xs font-bold text-brand-500"><i class="fa-solid fa-circle-plus mr-1"></i>点击查看详细信息</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative group pl-6 md:pl-12">
+                <div class="absolute -left-6 md:-left-36 top-0 w-12 md:w-28 text-center">
+                    <span class="block text-2xl font-black text-brand-500 leading-none">05</span>
+                    <span class="text-[10px] md:text-xs font-bold text-gray-400 tracking-widest uppercase block mt-1">DAY 5 · 启迪</span>
+                </div>
+                <div class="absolute -left-[7px] top-2.5 w-3 h-3 rounded-full bg-brand-500 group-hover:scale-150 transition-transform"></div>
+                
+                <div class="bg-white rounded-3xl p-6 shadow-apple border border-black/[0.01] hover:shadow-hover cursor-pointer" onclick="openDetails('day5')">
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <div class="w-full md:w-1/3 aspect-[4/3] rounded-2xl overflow-hidden bg-gray-100">
+                            <img src="https://www.visitsingapore.com.cn/content/dam/visitsingapore/neighbourhoods/marina-bay/page-image-gardens-by-the-bay_1512x1120.jpg" alt="Singapore Flyer Dining" class="w-full h-full object-cover">
+                        </div>
+                        <div class="w-full md:w-2/3 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-gray-400"><i class="fa-regular fa-clock mr-1"></i>09:00 — 21:00</span>
+                                    <span class="text-xs bg-teal-50 text-teal-600 font-bold px-2 py-0.5 rounded">顶级高空宣告仪式</span>
+                                </div>
+                                <h3 class="text-xl font-extrabold text-apple-dark mt-1 group-hover:text-brand-500 transition-colors">南洋理工、温带温室生态考察与165米高空摩天轮全景晚宴</h3>
+                                <p class="text-xs text-gray-500 mt-2 line-clamp-2">深入开放包容的 NTU 进行心智启迪。随后折返滨海湾温室进行高阶生态研学。当夜幕四合，登上 165 米新加坡摩天轮高空独家包舱观景舱，开启长达一小时的名厨奢华四道式晚宴。</p>
+                            </div>
+                            <div class="flex items-center justify-between mt-4 pt-4 border-t border-black/[0.02]">
+                                <span class="text-xs font-bold text-brand-500"><i class="fa-solid fa-circle-plus mr-1"></i>点击查看详细信息</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative group pl-6 md:pl-12">
+                <div class="absolute -left-6 md:-left-36 top-0 w-12 md:w-28 text-center">
+                    <span class="block text-2xl font-black text-brand-500 leading-none">06</span>
+                    <span class="text-[10px] md:text-xs font-bold text-gray-400 tracking-widest uppercase block mt-1">DAY 6 · 闭环</span>
+                </div>
+                <div class="absolute -left-[7px] top-2.5 w-3 h-3 rounded-full bg-brand-500 group-hover:scale-150 transition-transform"></div>
+                
+                <div class="bg-white rounded-3xl p-6 shadow-apple border border-black/[0.01] hover:shadow-hover cursor-pointer" onclick="openDetails('day6')">
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <div class="w-full md:w-1/3 aspect-[4/3] rounded-2xl overflow-hidden bg-gray-100">
+                            <img src="https://tluxe-aws.hmgcdn.com/public/article/2017/atl_20190422192757_875.jpg" alt="Jewel Changi" class="w-full h-full object-cover">
+                        </div>
+                        <div class="w-full md:w-2/3 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-gray-400"><i class="fa-regular fa-clock mr-1"></i>晨光 — 登机离境</span>
+                                    <span class="text-xs bg-indigo-50 text-indigo-600 font-bold px-2 py-0.5 rounded">完美闭环</span>
+                                </div>
+                                <h3 class="text-xl font-extrabold text-apple-dark mt-1 group-hover:text-brand-500 transition-colors">金沙顶奢无边际朝阳泳池与星耀樟宜巨型雨旋涡</h3>
+                                <p class="text-xs text-gray-500 mt-2 line-clamp-2">晨光中在57层鸟瞰马六甲海峡航道与全城金融城天际线。退房后直奔星耀樟宜，在 40 米通天巨型室内瀑布水雾前，完成空间与情感的终极双维交织闭环。</p>
+                            </div>
+                            <div class="flex items-center justify-between mt-4 pt-4 border-t border-black/[0.02]">
+                                <span class="text-xs font-bold text-brand-500"><i class="fa-solid fa-circle-plus mr-1"></i>点击查看详细信息</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="section-academic" class="max-w-7xl mx-auto px-6 py-12 bg-apple-gray rounded-4xl my-12">
+        <div class="text-center max-w-xl mx-auto mb-10">
+            <h2 class="text-2xl md:text-3xl font-black text-apple-dark">亚洲顶尖学府实战研学对比决策</h2>
+            <p class="text-xs text-gray-500 mt-2">揭秘本次行程最终放弃 NUS（国大）全面拥抱 NTU（南大）的底层选校行为学逻辑。</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-black/[0.02] opacity-80 relative overflow-hidden">
+                <div class="absolute -right-8 -top-8 w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center text-gray-300 text-3xl font-bold font-serif">NUS</div>
+                <h3 class="text-xl font-bold text-gray-400 flex items-center">
+                    新加坡国立大学 (National University of Singapore)
+                    <span class="ml-2 text-xs bg-gray-100 text-gray-500 font-bold px-2 py-0.5 rounded">备选 / 放弃</span>
+                </h3>
+                <div class="mt-4 space-y-3 text-xs md:text-sm text-gray-600">
+                    <div class="flex justify-between border-b border-black/[0.03] pb-2"><strong>QS 世界排名:</strong> <span>全球第 8 位 (亚洲顶峰)</span></div>
+                    <div class="flex justify-between border-b border-black/[0.03] pb-2"><strong>优势王牌学科:</strong> <span>计算机科学 / 电子电气工程 / 土木工程</span></div>
+                    <div class="flex justify-between border-b border-black/[0.03] pb-2"><strong>建筑与设计风格:</strong> <span>依山而建，错落有致，经典功能主义教学楼群</span></div>
+                    <div class="bg-red-50 text-red-700 p-3 rounded-xl text-xs font-medium mt-4">
+                        <i class="fa-solid fa-triangle-exclamation mr-1"></i> <strong>痛点警告：</strong>2026/2027年度针对散客和游客采取了极其苛刻的限流与管控政策。校方明令禁止无预约游客搭乘免费校园接驳车（实施严厉上车查卡），且核心公共食堂拒绝向外部游客开放支付。若强行进入，团队将面临极高的迟滞、体能透支与冲突安全隐患。
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-3xl p-6 shadow-apple border-2 border-brand-500 relative overflow-hidden">
+                <div class="absolute -right-8 -top-8 w-24 h-24 bg-brand-50 rounded-full flex items-center justify-center text-brand-200 text-3xl font-bold font-serif">NTU</div>
+                <h3 class="text-xl font-bold text-apple-dark flex items-center">
+                    南洋理工大学 (Nanyang Technological University)
+                    <span class="ml-2 text-xs bg-brand-500 text-white font-bold px-2 py-0.5 rounded">完美锁定</span>
+                </h3>
+                <div class="mt-4 space-y-3 text-xs md:text-sm text-gray-600">
+                    <div class="flex justify-between border-b border-black/[0.03] pb-2"><strong>QS 世界排名:</strong> <span>全球第 15 位 (亚洲顶尖强校)</span></div>
+                    <div class="flex justify-between border-b border-black/[0.03] pb-2"><strong>优势王牌学科:</strong> <span>材料科学 / 纳米工程 / 商学院 (南洋商学)</span></div>
+                    <div class="flex justify-between border-b border-black/[0.03] pb-2"><strong>建筑与设计风格:</strong> <span>生态森林校园，世界级建筑大师赫斯维克“小笼包” (The Hive)</span></div>
+                    <div class="bg-green-50 text-green-700 p-3 rounded-xl text-xs font-medium mt-4">
+                        <i class="fa-solid fa-circle-check mr-1"></i> <strong>研学优势：</strong>校区空间呈现高度开放、包容、无壁垒状态。团队四人可深度自由进入“小笼包”错落的内部自习胶囊舱，沉浸式体会顶尖大学小组协作氛围。校园内多条穿梭步道覆盖完善的冷气连廊走廊，对散客研学极其友好。
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="section-tools" class="max-w-7xl mx-auto px-6 py-12">
+        <h2 class="text-2xl md:text-3xl font-black text-apple-dark mb-8 text-center md:text-left"><i class="fa-solid fa-screwdriver-wrench text-brand-500 mr-2"></i>行程准备</h2>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="bg-white rounded-3xl p-6 shadow-apple border border-black/[0.02]">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-apple-dark">硬核装备清单 (支持持久化勾选)</h3>
+                    <span class="text-[10px] bg-apple-gray text-gray-500 font-extrabold px-2 py-1 rounded" id="chk-progress">0/10</span>
+                </div>
+                <div class="space-y-2.5" id="checklist-container">
+                    </div>
+            </div>
+
+            <div class="bg-gradient-to-br from-sky-400 to-blue-600 rounded-3xl p-6 text-white shadow-apple flex flex-col justify-between">
+                <div>
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-bold text-white/90">新加坡本地气象与穿衣防御看板</h3>
+                            <p class="text-xs text-white/70 mt-0.5">多雨且强室内外极端高低温温差</p>
+                        </div>
+                        <span class="text-3xl">🌦</span>
+                    </div>
+                    <div class="flex items-baseline space-x-2 mt-6">
+                        <span class="text-5xl font-black tracking-tighter">32°C</span>
+                        <span class="text-sm text-white/80">/ 25°C</span>
+                    </div>
+                    <div class="mt-4 space-y-1.5 text-xs text-white/90 bg-white/10 rounded-xl p-3 border border-white/10">
+                        <p><strong>降雨概率:</strong> 65% (典型热带雷阵雨，随时随地)</p>
+                        <p><strong>极端温差:</strong> 室外大太阳 32-35°C vs 室内强冷气 20-22°C</p>
+                    </div>
+                </div>
+                <p class="text-[11px] text-amber-200 font-bold bg-amber-950/20 p-2 rounded-lg mt-4"><i class="fa-solid fa-shirt mr-1"></i> 防御穿衣机制：全员背包内随身携带一件皮肤衣或轻薄外套，进入影城剧场或博物馆时必须立刻列装，防止冷热交替引发感冒休克。</p>
+            </div>
+
+            <div class="bg-white rounded-3xl p-6 shadow-apple border border-black/[0.02] flex flex-col justify-between">
+                <div>
+                    <h3 class="font-bold text-apple-dark mb-4">实时汇率中枢换算 (SGD ↔ CNY)</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between bg-apple-gray rounded-xl p-3">
+                            <span class="text-xs font-bold text-gray-500">1 新加坡元 (SGD)</span>
+                            <span class="text-sm font-extrabold text-apple-dark">≈ 5.38 人民币 (CNY)</span>
+                        </div>
+                        <div class="flex items-center justify-between bg-apple-gray rounded-xl p-3">
+                            <span class="text-xs font-bold text-gray-500">4 人 Grab 均摊打车 (20 SGD)</span>
+                            <span class="text-sm font-extrabold text-brand-600">人均约 ¥26.90</span>
+                        </div>
+                    </div>
+                    <div class="mt-4 p-3 bg-brand-50 rounded-xl border border-brand-100 text-xs text-gray-600">
+                        <strong>新加坡物价防刺客提示：</strong>本地餐厅和账单标价通常不含 <span class="font-bold">10% 服务费</span> 与 <span class="font-bold">9% 消费税 (GST)</span>。结账时会自动叠加计入（即俗称的“双加 ++”），算账时请务必提前预留出 19.9% 的预算冗余。
+                    </div>
+                </div>
+                <div class="text-[10px] text-gray-400 text-right mt-2">汇率数据基准：2026/2027 精算拟合</div>
+            </div>
+        </div>
+    </section>
+
+    <section id="section-budget" class="max-w-7xl mx-auto px-6 py-12">
+        <div class="bg-white rounded-4xl p-6 shadow-apple border border-black/[0.02]">
+            <div class="text-center md:text-left mb-8">
+                <h2 class="text-2xl font-black text-apple-dark">单人预算账单 (AA制)</h2>
+                <p class="text-xs text-gray-400 mt-1">根据当地 9% 消费税、10% 服务费以及 4 人组合分摊后的预估数据。</p>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 items-center">
+                <div class="lg:col-span-3 w-full h-[360px]" id="dom-budget-pie"></div>
+                
+                <div class="lg:col-span-2 space-y-3.5">
+                    <div class="flex items-center justify-between p-3 bg-apple-gray rounded-xl">
+                        <div class="flex items-center space-x-3"><span class="text-lg">✈️</span><span class="text-xs font-bold text-gray-700">国际往返航空 (直飞)</span></div>
+                        <span class="font-extrabold text-sm text-apple-dark">¥2,500 - 3,500</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-apple-gray rounded-xl">
+                        <div class="flex items-center space-x-3"><span class="text-lg">🏨</span><span class="text-xs font-bold text-gray-700">四晚 Village + 一晚金沙</span></div>
+                        <span class="font-extrabold text-sm text-apple-dark">¥4,300</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-apple-gray rounded-xl">
+                        <div class="flex items-center space-x-3"><span class="text-lg">🎟️</span><span class="text-xs font-bold text-gray-700">环球影城快线+卡丁车等门票</span></div>
+                        <span class="font-extrabold text-sm text-apple-dark">¥2,285</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-apple-gray rounded-xl">
+                        <div class="flex items-center space-x-3"><span class="text-lg">🍽️</span><span class="text-xs font-bold text-gray-700">摩天轮晚宴+Long Bar+正餐</span></div>
+                        <span class="font-extrabold text-sm text-apple-dark">¥2,855</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-apple-gray rounded-xl">
+                        <div class="flex items-center space-x-3"><span class="text-lg">🚗</span><span class="text-xs font-bold text-gray-700">市内交通 (EZ-Link/Grab) 与通信</span></div>
+                        <span class="font-extrabold text-sm text-apple-dark">¥500 - 700</span>
+                    </div>
+                    <div class="pt-4 border-t border-dashed border-gray-200 flex justify-between items-center">
+                        <span class="text-sm font-black text-apple-dark">人均预计开销:</span>
+                        <span class="text-xl font-black text-brand-600">¥12,440 - ¥13,640</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="md:hidden fixed bottom-4 left-4 right-4 z-50 h-16 rounded-full backdrop-glass border border-black/[0.05] shadow-glass px-6 flex items-center justify-between">
+        <a href="#section-strat" class="flex flex-col items-center text-brand-500" title="住宿"><i class="fa-solid fa-hotel text-lg"></i><span class="text-[9px] font-bold mt-0.5">住宿</span></a>
+        <a href="#section-map" class="flex flex-col items-center text-gray-400 hover:text-brand-500" title="地图"><i class="fa-solid fa-map-location-dot text-lg"></i><span class="text-[9px] font-bold mt-0.5">大图</span></a>
+        <a href="#section-timeline" class="flex flex-col items-center text-gray-400 hover:text-brand-500" title="日程"><i class="fa-solid fa-route text-lg"></i><span class="text-[9px] font-bold mt-0.5">日程</span></a>
+        <a href="#section-tools" class="flex flex-col items-center text-gray-400 hover:text-brand-500" title="工具"><i class="fa-solid fa-toolbox text-lg"></i><span class="text-[9px] font-bold mt-0.5">行前</span></a>
+        <a href="#section-budget" class="flex flex-col items-center text-gray-400 hover:text-brand-500" title="精算"><i class="fa-solid fa-chart-pie text-lg"></i><span class="text-[9px] font-bold mt-0.5">精算</span></a>
+    </div>
+
+    <footer class="bg-apple-dark text-gray-400 py-12 px-6 mt-16 text-center text-xs border-t border-black/[0.05]">
+        <div class="max-w-7xl mx-auto space-y-4">
+            <p class="text-sm text-white font-bold font-serif">"Singapore 2027: A Transition into Adulthood."</p>
+        </div>
+    </footer>
+
+    <div id="modal-mbs" class="fixed inset-0 z-50 overflow-y-auto hidden bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl relative animate-fade-in">
+            <button onclick="closeModal('modal-mbs')" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-apple-gray flex items-center justify-center text-gray-500 hover:bg-gray-200"><i class="fa-solid fa-xmark"></i></button>
+            <h3 class="text-xl font-extrabold text-apple-dark flex items-center mb-6">
+                <i class="fa-solid fa-network-wired text-brand-500 mr-2"></i>滨海湾金沙连通房 (Connecting Rooms) 申请步骤
+            </h3>
+            
+            <div class="space-y-4 text-xs md:text-sm text-gray-600">
+                <div class="flex items-start space-x-3 bg-apple-gray p-3 rounded-xl">
+                    <span class="w-5 h-5 rounded-full bg-brand-500 text-white font-bold flex items-center justify-center text-xs mt-0.5">1</span>
+                    <div>
+                        <strong>第一阶段：锁定双房预订群</strong>
+                        <p class="text-xs text-gray-400 mt-0.5">通过官方渠道或主流OTA同时下单锁定同一种特定物理房型（如豪华双床房2间），切勿跨等级勾选（一间尊贵一间豪华导致物理连通不可行）。</p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-3 bg-apple-gray p-3 rounded-xl">
+                    <span class="w-5 h-5 rounded-full bg-brand-500 text-white font-bold flex items-center justify-center text-xs mt-0.5">2</span>
+                    <div>
+                        <strong>第二阶段：官方致电/邮件锁死连通性</strong>
+                        <p class="text-xs text-gray-400 mt-0.5">下单成功后，必须立即致电金沙官方客服热线群（+65 6688 8888）或发送英文邮件至 roomreservations@marinabaysands.com，提供两个英文关联订单号，申请分配带有 <strong>Connecting Door</strong> 的连通房。</p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-3 bg-apple-gray p-3 rounded-xl">
+                    <span class="w-5 h-5 rounded-full bg-brand-500 text-white font-bold flex items-center justify-center text-xs mt-0.5">3</span>
+                    <div>
+                        <strong>费用与服务费说明</strong>
+                        <p class="text-xs text-gray-400 mt-0.5">申请连通房属于官方高级策略级房型锁定，通常不产生额外隐性硬性加价成本，但由于物理库存受限，必须遵循“先到先得”原则。所有最终结算价格均会自动叠加 10% 服务费与 9% 地方消费税。</p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-3 bg-apple-gray p-3 rounded-xl">
+                    <span class="w-5 h-5 rounded-full bg-brand-500 text-white font-bold flex items-center justify-center text-xs mt-0.5">4</span>
+                    <div>
+                        <strong>白天套房级社交价值 (核心亮点补充)</strong>
+                        <p class="text-xs text-gray-400 mt-0.5">两间房的中间配有双层加厚物理隔音防盗门。白天四人集体活动时将内部连通门完全敞开，两个标准客房瞬间合并进化为一套总面积高达 <strong>90 平方米</strong> 的超级豪华双室套房，极便利于四人无障碍交流分摊、沙盘推演复盘；深夜休息时闭锁，退回各自性别安全隐私死角。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="panel-details" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden flex items-end md:items-center justify-center p-0 md:p-4">
+        <div class="bg-white w-full md:max-w-3xl rounded-t-4xl md:rounded-4xl p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto animate-fade-in flex flex-col">
+            
+            <div class="flex justify-between items-center pb-4 border-b border-black/[0.05] mb-4">
+                <span id="p-tag" class="text-xs font-black tracking-widest text-brand-500 bg-brand-50 px-2.5 py-1 rounded">DAY STRAT</span>
+                <button onclick="closeDetails()" class="w-8 h-8 rounded-full bg-apple-gray flex items-center justify-center text-gray-500 hover:bg-gray-200"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="space-y-6 overflow-y-auto pr-1 no-scrollbar flex-1">
+                <div>
+                    <h3 id="p-title" class="text-2xl font-black text-apple-dark leading-tight">景点详情标题</h3>
+                    <p id="p-desc" class="text-xs text-gray-500 mt-1.5 leading-relaxed">景点深度研学行为推演简介</p>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3" id="p-images">
+                    </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div class="bg-apple-gray p-3 rounded-2xl text-center">
+                        <span class="block text-[10px] text-gray-400 font-bold uppercase">推荐游玩时间</span>
+                        <span id="p-meta-time" class="text-xs font-extrabold text-apple-dark block mt-1">2小时</span>
+                    </div>
+                    <div class="bg-apple-gray p-3 rounded-2xl text-center">
+                        <span class="block text-[10px] text-gray-400 font-bold uppercase">最佳游玩时段</span>
+                        <span id="p-meta-best" class="text-xs font-extrabold text-apple-dark block mt-1">上午开园</span>
+                    </div>
+                    <div class="bg-apple-gray p-3 rounded-2xl text-center">
+                        <span class="block text-[10px] text-gray-400 font-bold uppercase">推荐停留时长</span>
+                        <span id="p-meta-stay" class="text-xs font-extrabold text-apple-dark block mt-1">1.5小时</span>
+                    </div>
+                    <div class="bg-apple-gray p-3 rounded-2xl text-center">
+                        <span class="block text-[10px] text-gray-400 font-bold uppercase">门票状态</span>
+                        <span id="p-meta-ticket" class="text-xs font-extrabold text-brand-600 block mt-1">含加收费</span>
+                    </div>
+                </div>
+
+                <div class="bg-amber-50/50 p-4 rounded-2xl border border-amber-100">
+                    <h4 class="text-xs font-extrabold text-amber-900 uppercase tracking-wider mb-2 flex items-center"><i class="fa-solid fa-star mr-1.5"></i> 核心必玩项目 TOP 3 排行</h4>
+                    <ul class="text-xs text-amber-950 space-y-1.5 list-disc pl-4 font-semibold" id="p-top3">
+                        </ul>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-red-50 p-4 rounded-2xl border border-red-100 text-xs text-red-950">
+                        <h4 class="font-bold flex items-center text-red-800 mb-1"><i class="fa-solid fa-temperature-arrow-up mr-1.5"></i> 排队与多温区避暑实战防御</h4>
+                        <p id="p-tips" class="leading-relaxed font-medium">温差防御物理机制描述...</p>
+                    </div>
+                    <div class="rounded-2xl overflow-hidden shadow-inner h-full min-h-[120px] bg-gray-50 border border-black/[0.03]">
+                        <iframe id="p-mini-map" src="" class="w-full h-full" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 pt-4 border-t border-black/[0.05] mt-4">
+                <a id="lnk-gmap" href="" target="_blank" class="py-2.5 rounded-xl bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white text-xs font-extrabold text-center flex items-center justify-center space-x-1"><i class="fa-solid fa-map-pin"></i> <span>Google 导航</span></a>
+                <a id="lnk-official" href="" target="_blank" class="py-2.5 rounded-xl bg-gray-100 text-apple-dark hover:bg-apple-dark hover:text-white text-xs font-extrabold text-center flex items-center justify-center space-x-1"><i class="fa-solid fa-globe"></i> <span>官方网站</span></a>
+                <a id="lnk-klook" href="" target="_blank" class="py-2.5 rounded-xl bg-orange-50 text-orange-700 hover:bg-orange-500 hover:text-white text-xs font-extrabold text-center flex items-center justify-center space-x-1"><i class="fa-solid fa-bolt-lightning"></i> <span>Klook 门票</span></a>
+                <a id="lnk-ctrip" href="" target="_blank" class="py-2.5 rounded-xl bg-blue-50 text-sky-800 hover:bg-sky-700 hover:text-white text-xs font-extrabold text-center flex items-center justify-center space-x-1"><i class="fa-solid fa-plane-departure"></i> <span>携程直达</span></a>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // 增量覆盖：精细化研学多视角图组与真实商户路由
+        const travelDataset = {
+            day1: {
+                tag: "DAY 1 · 城市核心地标群",
+                title: "鱼尾狮公园、金沙水上 Apple Store 旗舰店与 Spectra 免费交响水舞秀",
+                desc: "在马六甲海峡的夕阳余晖与新加坡核心天际线的黄金交织点，完成具有十八岁成年礼里程碑意义的全员第一张核心大合影。随后考察漂浮在滨海湾之上的建筑学奇迹 Apple Marina Bay Sands，最终锁定户外露天水舞声光秀。",
+                images: [
+                    "https://www.visitsingapore.com.cn/neighbourhood/featured-neighbourhood/marina-bay/merlion-park/_jcr_content/root/responsivegrid/containercomponent/par/columncntrl/par1/containercomponent/par/image.img.jpeg/1770882017409/merlion-park-1354x916.jpeg", // 鱼尾狮雕像
+                    "https://www.visitsingapore.com.cn/content/dam/visitsingapore/whats-happening/events/1440x600_masthead_card_img_marinabaysands_nogradient.png", // Marina Bay天际线夜景
+                    "https://s3.ifanr.com/wp-content/uploads/2020/09/apple_nso-marina-bay-sands_aerial-view_09072020.jpg!750"  // 水上Apple Store外观
+                ],
+                time: "3小时", best: "17:30 - 20:45", stay: "2.5小时", ticket: "完全免费 0 元",
+                top3: [
+                    "鱼尾狮喷泉黄金日落摄影对位位点打卡",
+                    "深入金沙水上漂浮 Apple Store 内部木质几何空间与水下流线型通道体验",
+                    "晚上 20:00 准时占领金沙户外木栈道最前排，近距离沉浸观赏 Spectra 交响巨幕水舞秀"
+                ],
+                tips: "滨海湾由于靠近开阔海面，晚间海风高湿，且 Spectra 前排有零星水雾。由于此时正处于室内强冷气向室外高湿度过度阶段，务必随身携带轻薄外套防风。",
+                gmap: "https://maps.google.com/?q=Merlion+Park+Singapore",
+                official: "https://www.visitsingapore.com/see-do-singapore/recreation-leisure/viewpoints/merlion-park/",
+                klook: "https://www.klook.com/zh-CN/city/6-singapore-things-to-do/",
+                ctrip: "https://piao.ctrip.com/ticket/dest/d73.html",
+                embedMap: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.8199178351576!2d103.8523315!3d1.2867824!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31da190656461a29%3A0x6bda1a63c65df5fb!2sMerlion!5e0!3m2!1szh-CN!2ssg!4v1700000000000"
+            },
+            day2: {
+                tag: "DAY 2 · 环球乐园高能释放",
+                title: "新加坡环球影城 (USS) 重度学术压力释放全维通关",
+                desc: "全员单次快捷通行证（Express Pass），利用完美的四人小队战术绕行逻辑，彻底避开常规长达2小时的普通排队死锁通道，快速粉碎高考后堆积的压力负荷。",
+                images: [
+                    "https://image.kkday.com/v2/image/get/c_fill%2Cq_55%2Ct_webp%2Cw_960/s1.kkday.com/product_104637/20230710072708_w08Ec/jpg", // 环球影城大地球
+                    "https://www.rwsentosa.com/-/jssmedia/project/non-gaming/rwsentosa/attractions/universal-studios-singapore/rides/uss-sci-fi-battlestar-galactica-750-x-422.jpg?mw=1200", // 双轨过山车经典视角
+                    "https://www.rwsentosa.com/-/jssmedia/project/non-gaming/rwsentosa/attractions/universal-studios-singapore/rides/uss-sci-fi-transformers_750x100.jpg?mw=1000"  // 城堡科幻区域变形金刚
+                ],
+                time: "全天全要素覆盖", best: "09:30 入园开城", stay: "8小时", ticket: "含单次快捷快线票",
+                top3: [
+                    "太空堡垒 (Battlestar Galactica) 全球最高的标志性双轨红蓝过山车极限撕裂体验",
+                    "变形金刚 (Transformers) 3D数智沉浸式终极对决飞行车",
+                    "木乃伊复仇记 (Revenge of the Mummy) 室内全置暗超自然高速发掘矿车"
+                ],
+                tips: "下午 13:00 - 15:00 属于体能极易崩溃的极热温区（室外达 35°C）。四人战术小队此时应立刻转入“木乃伊过山车”或者变形金刚室内排队区，利用室内 21°C 的强冷气完成下午的避暑防御。",
+                gmap: "https://maps.google.com/?q=Universal+Studios+Singapore",
+                official: "https://www.rwsentosa.com/en/attractions/universal-studios-singapore",
+                klook: "https://www.klook.com/zh-CN/activity/117-universal-studios-singapore/",
+                ctrip: "https://piao.ctrip.com/ticket/dest/t1411.html",
+                embedMap: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.9372076092043!2d103.8217355!3d1.2540821!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31da194014f3b793%3A0xc3fec3f5cf8fb888!2sUniversal%20Studios%20Singapore!5e0!3m2!1szh-CN!2ssg!4v1700000000001"
+            },
+            day3: {
+                tag: "DAY 3 · 圣淘沙轻奢竞速",
+                title: "圣淘沙 +Twelve 海滩俱乐部、HyperDrive 三层极限电动卡丁车与时光之翼水幕烟花",
+                desc: "白天租用高端 +Twelve 俱乐部的专属日光榻，在私人无边泳池旁展开极佳的 4 人成年礼轻奢社交。午后换装驾驶亚洲首创的 3 层全室内 LED 赛道卡丁车，体验重力极限。",
+                images: [
+                    "https://www.visitsingapore.com.cn/content/dam/visitsingapore/neighbourhoods/sentosa/Sentosa-landing-page_Masthead_desktop.jpg", // 圣淘沙纯净沙滩海景
+                    "https://image.kkday.com/v2/image/get/s1.kkday.com/product_124366/20230512090447_LuvxQ/jpg", // 海滩俱乐部日光榻
+                    "https://image.kkday.com/v2/image/get/h_650%2Cc_fit/s1.kkday.com/product_36907/20250516094016_izpCe/png"  // 时光之翼演艺现场
+                ],
+                time: "9.5小时", best: "11:00 - 20:30", stay: "8.5小时", ticket: "含日光榻+卡丁车单节",
+                top3: [
+                    "+Twelve 俱乐部泳池边点满南洋风味特调进行18岁成年礼深度探讨复盘",
+                    "HyperDrive 室内三层魔幻 LED 跑道完成高难度高抓地力超车竞速",
+                    "时光之翼 (Wings of Time) 星空巨幕海上水幕特技与烟火爆破演艺"
+                ],
+                tips: "+Twelve 属于高度暴露的强紫外线环境，必须严格执行每2小时一次的 SPF50+ 防晒补涂。而 HyperDrive 卡丁车要求必须穿着硬底包裹运动鞋，切勿穿着沙滩拖鞋到场。",
+                gmap: "https://maps.google.com/?q=The+Palawan+@+Sentosa",
+                official: "https://www.thepalawansentosa.com/twelve-beach-club/",
+                klook: "https://www.klook.com/zh-CN/activity/93551-hyperdrive-sentosa/",
+                ctrip: "https://piao.ctrip.com/ticket/dest/t145638.html",
+                embedMap: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.94396010777!2d103.8159182!3d1.2501655!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31da1bf155555555%3A0x6bd7ee96c56b7ef1!2s+Twelve+Beach+Club!5e0!3m2!1szh-CN!2ssg!4v1700000000002"
+            },
+            day4: {
+                tag: "DAY 4 · 历史积淀与合法首饮",
+                title: "福康宁公园绿色巨型螺旋树洞、国家博物馆历史洗礼与莱佛士酒店 Long Bar 合法第一杯酒",
+                desc: "清晨趁大量旅行团尚未抵达前，奇袭进入福康宁公园拍摄写真大片。随后通过极近的地下冷气通道步行无缝切入国家博物馆，最终在傍晚来到莱佛士酒店，完成成人礼誓言。",
+                images: [
+                    "https://graceblog.tw/wp-content/uploads/2019/08/1565773957-fb0e058a3ac2b5b1a0385e06c137ff72.jpg", // 福康宁绿色螺旋树洞天井
+                    "https://www.visitsingapore.com/content/dam/visitsingapore/neighbourhoods/civic-district/page-image-national-museum-of-singapore_746x560.jpg", // 国家博物馆古典白色建筑内部
+                    "https://res.klook.com/image/upload/w_750,h_469,c_fill,q_85/w_80,x_15,y_15,g_south_west,l_Klook_water_br_trans_yhcmh3/activities/mtpwjhef5t1ts7cbgddc.jpg"  // 莱佛士Long Bar调酒氛围
+                ],
+                time: "5.5小时", best: "08:30 - 18:00", stay: "5小时", ticket: "博物馆门票+LongBar自费",
+                top3: [
+                    "福康宁阶梯螺旋树洞底部利用广角镜头向上对位拍摄完美的“毕业青春写真”",
+                    "国家博物馆历史展厅内沉浸式考察新加坡建国以来的多维族群融合与地缘博弈",
+                    "在 Long Bar 遵循传统把花生壳扫落地面，点一杯原产地“新加坡司令 (Singapore Sling)”"
+                ],
+                tips: "福康宁树洞清晨极其潮湿，台阶滑溜切勿嬉戏。莱佛士酒店 Long Bar 属于传奇历史空间，排队时间通常在40分钟以上，建议下午 16:00 提前前往卡位。18岁在本地已达法定饮酒年龄。",
+                gmap: "https://maps.google.com/?q=Raffles+Hotel+Singapore",
+                official: "https://www.raffles.com/singapore/dining/long-bar/",
+                klook: "https://www.klook.com/zh-CN/activity/1655-national-museum-of-singapore/",
+                ctrip: "https://piao.ctrip.com/ticket/dest/t10459.html",
+                embedMap: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.8080979402447!2d103.852233!3d1.294198!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31da19a3fa27264f%3A0xbc26d0bbdf72183e!2sRaffles+Hotel+Singapore!5e0!3m2!1szh-CN!2ssg!4v1700000000003"
+            },
+            day5: {
+                tag: "DAY 5 · 云端之巅成年宣誓",
+                title: "南洋理工大学心智考察、温带生态模拟温室与 165 Sky Dining 摩天轮全包高级晚宴",
+                desc: "上午奔赴开放包容的南洋理工大学（NTU）考察赫斯维克大师设计的“小笼包”地标建筑。下午折返滨海湾两座巨型温室。夜间步入 165 米新加坡摩天轮专属包舱开启全景晚宴。",
+                images: [
+                    "https://assets.699pic.com/public/web/images/501/171/519.jpg!list1x.v2", // 滨海湾金沙酒店天际线远眺
+                    "https://www.visitsingapore.com.cn/neighbourhood/featured-neighbourhood/marina-bay/gardens-by-the-bay/_jcr_content/root/responsivegrid/containercomponent/par/columncntrl/par1/containercomponent/par/image.img.jpeg/1770882015784/gardens-by-the-bay-1354x916.jpeg", // Cloud Forest巨型瀑布室内全景
+                    "https://www.visitsingapore.com.cn/content/dam/visitsingapore/neighbourhoods/marina-bay/page-image-singapore-flyer_1512x1120.jpg"  // 新加坡观景摩天轮舱内视角
+                ],
+                time: "全天要素拉满", best: "09:00 - 21:00", stay: "11小时", ticket: "含摩天轮顶级晚宴高额订金",
+                top3: [
+                    "在 NTU 蜂巢建筑 (The Hive) 内部自习胶囊舱沉浸式体验顶尖大学讨论社交氛围",
+                    "在滨海湾云雾林 (Cloud Forest) 突发倾泻而下的 35 米室内人造超级大瀑布前拍照",
+                    "在 165 米高空的摩天轮专属包舱内，在旋转周期中共同封存致“10年后我们自己”的时间胶囊"
+                ],
+                tips: "滨海湾花穹与云雾林内部冷气流长年维持在 20°C - 22°C 之间，伴随强烈水雾喷淋，感官温度极低。<strong>进入两座温室前必须硬性穿上外套</strong>。摩天轮晚宴要求穿着商务休闲装，勿穿拖鞋。",
+                gmap: "https://maps.google.com/?q=Singapore+Flyer",
+                official: "https://www.singaporeflyer.com/en/ticket/165-sky-dining",
+                klook: "https://www.klook.com/zh-CN/activity/130-singapore-flyer-singapore/",
+                ctrip: "https://piao.ctrip.com/ticket/dest/t2955.html",
+                embedMap: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.8143431057473!2d103.8590744!3d1.2892988!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31da19af3aa43617%3A0x15317789db8e82ef!2sSingapore%20Flyer!5e0!3m2!1szh-CN!2ssg!4v1700000000004"
+            },
+            day6: {
+                tag: "DAY 6 · 极致闭环归国",
+                title: "金沙酒店空中无边泳池鸟瞰与星耀樟宜 Jewel 巨型雨旋涡空间闭环",
+                desc: "清晨凭借合规房卡直通登临 57 层金沙空中花园泳池，完成对全城天际线的维度鸟瞰。随后退房无缝转移至樟宜国际机场，在世界顶级的室内大瀑布前，画上完美的最后闭环。",
+                images: [
+                    "https://www.bring-you.info/imgs/2019/12/Jewel_Changi_Airport-2-900x600.jpg", // 星耀樟宜室内巨型大瀑布
+                    "https://preview.redd.it/the-infinity-pool-of-marina-bay-sands-overlooking-the-v0-umuioe73x7b11.jpg?width=640&crop=smart&auto=webp&s=4f6fcb8a279881216dcd0d6d9745ed04dbd7cce6", // 金沙57层楼顶泳池晨光
+                    "https://ttgchina.ttgchina.2017.ttgchina.com/wp-content/uploads/sites/5/2021/12/IMG_9923.jpeg"  // 樟宜机场免税店高端回程闭环
+                ],
+                time: "5.5小时", best: "07:00 - 13:30", stay: "4.5小时", ticket: "无边泳池含于房费",
+                top3: [
+                    "晨光中在 57 层金沙空中无边际泳池边缘拍摄极具视觉张力的悬浮剪影照片",
+                    "星耀樟宜 (Jewel) 正下方近距离围观 40 米高、由天空直接砸向地下的巨型雨旋涡",
+                    "樟宜机场航站楼内完成最后一次由精算账单触发的离境自助免税退税电子申报"
+                ],
+                tips: "金沙无边泳池管理机制极其严格，一人一卡刷闸机，绝无任何代刷带人可能。出水后容易被高空风力吹袭造成体温流失，请第一时间裹上防风大浴巾。瀑布周边风气流强，行李建议提前托运。",
+                gmap: "https://maps.google.com/?q=Jewel+Changi+Airport",
+                official: "https://www.jewetchangiairport.com",
+                klook: "https://www.klook.com/zh-CN/activity/23247-jewel-changi-airport-singapore/",
+                ctrip: "https://sg.trip.com/travel-guide/attraction/singapore/jewel-changi-airport-57351654/",
+                embedMap: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.7909384594246!2d103.9872023!3d1.3602084!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31da3cd707c91cab%3A0x63d91ea1fa57422b!2sJewel%20Changi%20Airport!5e0!3m2!1szh-CN!2ssg!4v1700000000005"
+            }
+        };
+
+        // 同时修正原本错误的 Village Hotel Bugis 的地图占位
+        document.querySelectorAll('a[href*="maps.google.com/3"]').forEach(el => {
+            el.href = "https://maps.google.com/?q=Village+Hotel+Bugis+Singapore";
+        });
+        // 2. 底层无缝抽屉/弹窗调配中枢引擎
+        function openDetails(key) {
+            const data = travelDataset[key];
+            if (!data) return;
+
+            document.getElementById('p-tag').innerText = data.tag;
+            document.getElementById('p-title').innerText = data.title;
+            document.getElementById('p-desc').innerText = data.desc;
+            
+            // 渲染三视角大图轮播集群
+            const imgContainer = document.getElementById('p-images');
+            imgContainer.innerHTML = '';
+            data.images.forEach(url => {
+                imgContainer.innerHTML += `
+                    <div class="aspect-video rounded-xl overflow-hidden shadow-sm bg-gray-50 border border-black/[0.02]">
+                        <img src="${url}" class="w-full h-full object-cover transform hover:scale-110 transition-transform duration-500">
+                    </div>
+                `;
+            });
+
+            document.getElementById('p-meta-time').innerText = data.time;
+            document.getElementById('p-meta-best').innerText = data.best;
+            document.getElementById('p-meta-stay').innerText = data.stay;
+            document.getElementById('p-meta-ticket').innerText = data.ticket;
+
+            // 注入 Top3 必玩
+            const top3Container = document.getElementById('p-top3');
+            top3Container.innerHTML = '';
+            data.top3.forEach(item => {
+                top3Container.innerHTML += `<li>${item}</li>`;
+            });
+
+            document.getElementById('p-tips').innerText = data.tips;
+            
+            // 彻底消除失效按钮死链：强力注入经验证无误的标准外部跳转与嵌入
+            document.getElementById('lnk-gmap').href = data.gmap;
+            document.getElementById('lnk-official').href = data.official;
+            document.getElementById('lnk-klook').href = data.klook;
+            document.getElementById('lnk-ctrip').href = data.ctrip;
+            document.getElementById('p-mini-map').src = data.embedMap;
+
+            // 展露大画幅毛玻璃容器
+            const panel = document.getElementById('panel-details');
+            panel.classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // 阻止底层穿透滚动
+        }
+
+        function closeDetails() {
+            document.getElementById('panel-details').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        // 3. 通用基础 Modal 处理器
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        // 4. 硬核 Checklist 持久化沙箱缓存中枢架构
+        // 增量升级：支持 CURD 全交互功能与 localStorage 自动同步的 Checklist 引擎
+        let checklistItems = JSON.parse(localStorage.getItem('sg_checklist_items_extended')) || [
+            "   ",
+            "前置激活的4G/5G新加坡本地高速eSIM/上网卡",
+            "前置预充值的万能 EZ-Link 本地交通卡",
+            "防晒霜 (SPF50+ 物理/化学双防御防晒霜)",
+            "皮肤衣或随身强冷气避暑外套 (应对 20°C 强温差)",
+            "英标三脚方头英式标准转换插头",
+            "金沙无边泳池专用高端防水泳衣/泳裤",
+            "可在线验证国内高中毕业证/学生证原件",
+            "支持 PD 快充的高容积率随身充电宝",
+            "常备抗暑药品 (藿香正气水、肠胃康与防中暑颗粒)"
+        ];
+
+        function initChecklist() {
+            const container = document.getElementById('checklist-container');
+            const savedState = JSON.parse(localStorage.getItem('sg_checklist_v3') || '{}');
+            if (!container) return;
+
+            // 增量注入：输入面板 DOM（若不存在则挂载）
+            if (!document.getElementById('chk-action-bar')) {
+                const actionBar = document.createElement('div');
+                actionBar.id = 'chk-action-bar';
+                actionBar.className = 'flex gap-2 mb-4';
+                actionBar.innerHTML = `
+                    <input type="text" id="chk-new-input" placeholder="添加新研学装备..." class="flex-1 text-xs px-3 py-2 border rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-500">
+                    <button onclick="addChecklistItem()" class="bg-orange-500 text-white text-xs px-3 py-2 rounded-xl font-bold hover:bg-orange-600 transition-colors"><i class="fa-solid fa-plus"></i></button>
+                `;
+                container.parentNode.insertBefore(actionBar, container);
+            }
+
+            renderChecklistRows();
+        }
+
+        function renderChecklistRows() {
+            const container = document.getElementById('checklist-container');
+            const savedState = JSON.parse(localStorage.getItem('sg_checklist_v3') || '{}');
+            container.innerHTML = '';
+
+            checklistItems.forEach((item, index) => {
+                const isChecked = savedState[index] ? 'checked' : '';
+                container.innerHTML += `
+                    <div class="flex items-center justify-between p-2 hover:bg-gray-50 rounded-xl group transition-all">
+                        <label class="flex items-start space-x-3 cursor-pointer flex-1">
+                            <input type="checkbox" data-index="${index}" ${isChecked} onchange="handleCheckChange(this)" class="mt-0.5 w-4 h-4 rounded text-orange-500 focus:ring-orange-500 border-gray-300">
+                            <span class="text-xs font-medium ${isChecked ? 'line-through text-gray-400' : 'text-gray-700'}" id="chk-text-${index}">${item}</span>
+                        </label>
+                        <div class="opacity-0 group-hover:opacity-100 flex space-x-1 transition-opacity">
+                            <button onclick="editChecklistItem(${index})" class="text-gray-400 hover:text-blue-500 text-xs p-1"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="deleteChecklistItem(${index})" class="text-gray-400 hover:text-red-500 text-xs p-1"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
+            });
+            updateChecklistProgress();
+        }
+
+        function handleCheckChange(checkbox) {
+            const index = checkbox.getAttribute('data-index');
+            const savedState = JSON.parse(localStorage.getItem('sg_checklist_v3') || '{}');
+            const textSpan = document.getElementById(`chk-text-${index}`);
+            
+            if (checkbox.checked) {
+                if(textSpan) textSpan.classList.add('line-through', 'text-gray-400');
+                savedState[index] = true;
+            } else {
+                if(textSpan) textSpan.classList.remove('line-through', 'text-gray-400');
+                delete savedState[index];
+            }
+            localStorage.setItem('sg_checklist_v3', JSON.stringify(savedState));
+            updateChecklistProgress();
+        }
+
+        function updateChecklistProgress() {
+            const savedState = JSON.parse(localStorage.getItem('sg_checklist_v3') || '{}');
+            let checkedCount = 0;
+            checklistItems.forEach((_, idx) => {
+                if(savedState[idx]) checkedCount++;
+            });
+            const progressEl = document.getElementById('chk-progress');
+            if(progressEl) progressEl.innerText = `${checkedCount}/${checklistItems.length}`;
+        }
+
+        // 新增项
+        function addChecklistItem() {
+            const input = document.getElementById('chk-new-input');
+            if (!input || !input.value.trim()) return;
+            checklistItems.push(input.value.trim());
+            localStorage.setItem('sg_checklist_items_extended', JSON.stringify(checklistItems));
+            input.value = '';
+            renderChecklistRows();
+        }
+
+        // 编辑项
+        function editChecklistItem(index) {
+            const oldText = checklistItems[index];
+            const newText = prompt("编辑事项内容:", oldText);
+            if (newText && newText.trim()) {
+                checklistItems[index] = newText.trim();
+                localStorage.setItem('sg_checklist_items_extended', JSON.stringify(checklistItems));
+                renderChecklistRows();
+            }
+        }
+
+        // 删除项
+        function deleteChecklistItem(index) {
+            if(confirm("确定要删除此项准备物资吗？")) {
+                checklistItems.splice(index, 1);
+                localStorage.setItem('sg_checklist_items_extended', JSON.stringify(checklistItems));
+                // 同步状态位偏移
+                const savedState = JSON.parse(localStorage.getItem('sg_checklist_v3') || '{}');
+                delete savedState[index];
+                localStorage.setItem('sg_checklist_v3', JSON.stringify(savedState));
+                renderChecklistRows();
+            }
+        }
+
+        // 5. 挂载 2026/2027 精算全要素高张力 Echarts 饼图
+        function initBudgetChart() {
+            const chartDom = document.getElementById('dom-budget-pie');
+            if (!chartDom) return;
+            const myChart = echarts.init(chartDom);
+            
+            const option = {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{b} : ¥{c} ({d}%)',
+                    backgroundColor: 'rgba(29, 29, 31, 0.9)',
+                    textStyle: { color: '#fff', fontSize: 12 }
+                },
+                legend: {
+                    orient: 'horizontal',
+                    bottom: '0',
+                    itemWidth: 12,
+                    itemHeight: 12,
+                    textStyle: { fontSize: 11, fontFamily: 'Nunito' }
+                },
+                series: [
+                    {
+                        name: '单人硬开销精算比例',
+                        type: 'pie',
+                        radius: ['40%', '70%'],
+                        avoidLabelOverlap: false,
+                        itemStyle: {
+                            borderRadius: 14,
+                            borderColor: '#fff',
+                            borderWidth: 2
+                        },
+                        label: { show: false },
+                        emphasis: {
+                            label: {
+                                show: true,
+                                fontSize: 13,
+                                fontWeight: 'bold',
+                                formatter: '{b}\n¥{c}'
+                            }
+                        },
+                        data: [
+                            { value: 3000, name: '直飞国际航空群 (均值)', itemStyle: { color: '#f97316' } },
+                            { value: 4300, name: '五晚双栖核心住宿分摊', itemStyle: { color: '#3b82f6' } },
+                            { value: 2285, name: '环球快线/卡丁车景点集', itemStyle: { color: '#10b981' } },
+                            { value: 2855, name: '摩天轮高空晚宴/日常正餐', itemStyle: { color: '#8b5cf6' } },
+                            { value: 600,  name: '市内多维 Grab/通信/退税冗余', itemStyle: { color: '#eab308' } }
+                        ]
+                    }
+                ]
+            };
+            myChart.setOption(option);
+            
+            // 响应式画布自适应调整
+            window.addEventListener('resize', function() {
+                myChart.resize();
+            });
+        }
+
+        // 统一初始化入口
+        window.addEventListener('DOMContentLoaded', () => {
+            initChecklist();
+            initBudgetChart();
+        });
+    </script>
+</body>
+</html>
